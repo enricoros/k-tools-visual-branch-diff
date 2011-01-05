@@ -58,7 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
     setProgress(-1);
 
     ui->statusBar->showMessage("Detected: " + Console::readCommandOutput(ui->locationEdit->text(), "git --version") +
-                               " and: " + Console::readCommandOutput(ui->locationEdit->text(), "dot -V").left(30));
+                               " and: " + Console::readCommandOutput(ui->locationEdit->text(), "dot -V", 0, true).left(30));
 }
 
 MainWindow::~MainWindow()
@@ -104,7 +104,6 @@ void MainWindow::setProgress(int value)
 void MainWindow::populateBranchBoxes()
 {
     ui->branch1Combo->clear();
-    ui->branch1Combo->addItem(tr("The big bang"));
     ui->branch2Combo->clear();
     QStringList branches = QString(Console::readCommandOutput(ui->locationEdit->text(), "git branch -a")).split("\n");
     int index1 = -1, index2 = -1;
@@ -127,6 +126,9 @@ void MainWindow::populateBranchBoxes()
         ui->branch1Combo->setCurrentIndex(index1);
     if (index2 >= 0)
         ui->branch2Combo->setCurrentIndex(index2);
+    if (ui->branch1Combo->count())
+        ui->branch1Combo->insertItem(0, tr("The big bang"));
+
 }
 
 void MainWindow::slotPickColor()

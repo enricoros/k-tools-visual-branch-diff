@@ -1,0 +1,6 @@
+<RCC>
+    <qresource prefix="/">
+        <file>visual-branch-diff.png</file>
+        <file>folder_open.png</file>
+    </qresource>
+</RCC>

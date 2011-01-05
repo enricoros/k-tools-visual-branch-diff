@@ -17,3 +17,6 @@ HEADERS += \
 
 FORMS += \
     MainWindow.ui
+
+RESOURCES += \
+    visual-branch-diff.qrc

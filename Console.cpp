@@ -28,11 +28,12 @@
 #include "Console.h"
 #include <QProcess>
 
-QByteArray Console::readCommandOutput(const QString &dir, const QString &cmd, bool *ok)
+QByteArray Console::readCommandOutput(const QString &dir, const QString &cmd, bool *ok, bool readError)
 {
     QProcess proc;
     proc.setWorkingDirectory(dir);
-    proc.setReadChannelMode(QProcess::MergedChannels);
+    if (readError)
+        proc.setReadChannelMode(QProcess::MergedChannels);
     proc.start(cmd);
     bool finished = proc.waitForFinished();
     if (!finished && ok) {
