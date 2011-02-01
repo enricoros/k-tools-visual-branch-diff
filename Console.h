@@ -34,7 +34,8 @@
 namespace Console {
 
     /// returns the output of the comman cmd, executed from directory dir, ok will contain the status
-    QByteArray readCommandOutput(const QString &dir, const QString &cmd, bool *ok = 0, bool readError = false);
+    QByteArray readCommandOutput(const QString &dir, const QString &cmd, bool *ok = 0,
+                                 bool readError = false, int *duration = 0);
 
 } // namespace Console
 

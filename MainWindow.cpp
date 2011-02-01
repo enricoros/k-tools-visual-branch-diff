@@ -322,16 +322,20 @@ void MainWindow::slotRunClicked()
         foreach (const QString &diff, edgesDiffs) {
             setProgress(30 + (50 * edgeDiffsIdx++) / edgeDiffsCount);
             bool ok = false;
-            QByteArray diffStat = Console::readCommandOutput(dir, "git diff --stat " + diff, &ok);
+            int duration = 0;
+            QByteArray diffStat = Console::readCommandOutput(dir, "git diff --stat " + diff, &ok, false, &duration);
             if (!ok) {
-                qWarning("error executing git diff (%s)", qPrintable(diff));
+                qWarning("error executing git diff %s", qPrintable(diff));
                 continue;
             }
             QString edgeDiff = Git::parseDiffStat(diffStat);
             if (!edgeDiff.isEmpty())
                 histDelta.edgeDataMap[diff] = edgeDiff;
+            if (duration > 10) {
+                qWarning("huge diff: %s [%s]", qPrintable(diff), qPrintable(edgeDiff));
+            }
         }
-         setProgress(80);
+        setProgress(80);
     }
 
     QString dotFileName = "/tmp/graph.dot";    

@@ -27,20 +27,29 @@
 
 #include "Console.h"
 #include <QProcess>
+#include <QTime>
 
-QByteArray Console::readCommandOutput(const QString &dir, const QString &cmd, bool *ok, bool readError)
+QByteArray Console::readCommandOutput(const QString &dir, const QString &cmd, bool *ok, bool readError, int *duration)
 {
     QProcess proc;
     proc.setWorkingDirectory(dir);
     if (readError)
         proc.setReadChannelMode(QProcess::MergedChannels);
+    QTime timing;
+    timing.start();
     proc.start(cmd);
-    bool finished = proc.waitForFinished();
+    bool finished = proc.waitForFinished(60000);
+    if (duration)
+        *duration = qRound((qreal)timing.elapsed() / 1000.0);
     if (!finished && ok) {
         *ok = false;
+        qWarning("Console::readCommandOutput: error %d (%s)", proc.error(), qPrintable(proc.errorString()));
         return QByteArray();
     }
+    bool cleanExit = proc.exitCode() == 0;
+    if (!cleanExit)
+        qWarning("Console::readCommandOutput: unexpected return code: %d", proc.exitCode());
     if (ok)
-        *ok = proc.exitCode() == 0;
+        *ok = cleanExit;
     return proc.readAll();
 }
