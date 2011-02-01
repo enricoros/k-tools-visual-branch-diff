@@ -229,7 +229,7 @@ namespace Dot {
 
             // add spare nodes for unresolved parents
             foreach (const Git::SHA1 &id, item->unresolvedPreceding) {
-                QString name = id.left(7);
+                QString name = id.left(8);
                 if (!nodesMap.contains(name)) {
                     nodesMap.append(name);
                     ts << "    " << quoted(name) << " [shape=ellipse, color=" << lineColorRef << ", fontcolor=" << textColorRef <<  "];" << "\n";
@@ -267,7 +267,7 @@ namespace Dot {
                     if (history.edgeDataMap.contains(label))
                         label += "  (" + history.edgeDataMap[label] + ")";
                 }
-                writeEdge(ts, precUnresolved.left(7), change->shortUid, label, "style=dotted, color=" + lineColorRef);
+                writeEdge(ts, precUnresolved.left(8), change->shortUid, label, "style=dotted, color=" + lineColorRef);
             }
         }
 

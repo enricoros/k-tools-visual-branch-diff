@@ -60,7 +60,7 @@ QString Change::diffStringTo(const Change *next) const
 
 QString Change::diffStringFrom(const QString &sha1) const
 {
-    return QString("%1...%2").arg(sha1.left(7)).arg(shortUid);
+    return QString("%1...%2").arg(sha1.left(8)).arg(shortUid);
 }
 
 
@@ -150,7 +150,7 @@ Git::BranchHistory parseLogToHistory(const QByteArray &log)
         Git::Change *change = new Git::Change;
         QStringList ids = line.mid(7).split(" ", QString::SkipEmptyParts);
         change->commitUid = ids.takeFirst();
-        change->shortUid = change->commitUid.left(7);
+        change->shortUid = change->commitUid.left(8);
 
         history.idChangeMap[change->commitUid] = change;
         history.changesFlatList.append(change);
