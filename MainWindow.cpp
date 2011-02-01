@@ -36,6 +36,7 @@
 #include <QProcess>
 #include <QSettings>
 #include <QTextStream>
+#include <QTemporaryFile>
 #include <QUrl>
 
 MainWindow::MainWindow(QWidget *parent)
@@ -338,27 +339,39 @@ void MainWindow::slotRunClicked()
         setProgress(80);
     }
 
-    QString dotFileName = "/tmp/graph.dot";    
+    QTemporaryFile dotFileDummy("graph_XXXXXX.dot");
+    dotFileDummy.open();
+    QString dotFileName = dotFileDummy.fileName();
+    dotFileDummy.close();
+
     QString label = tr("<<B>Graph of changes between</B>:<BR/><I>%1</I>, and<BR/><I>%2</I><BR/>(%3 new nodes)>")
             .arg(b1).arg(b2).arg(histDelta.changesFlatList.size());
     Dot::writeGraphFile(histDelta, label, mColor2, mColor1,
                         ui->showEdgeDiff->isChecked(), dotFileName);
      setProgress(85);
 
-    QString dotType, dotExt;
+    QString dotType, imgExt;
     switch (ui->typesBox->currentIndex()) {
-    case 0: dotType = "png"; dotExt = "png"; break;
-    case 1: dotType = "svg"; dotExt = "svg"; break;
-    case 2: dotType = "pdf"; dotExt = "pdf"; break;
+    case 0: dotType = "png"; imgExt = "png"; break;
+    case 1: dotType = "svg"; imgExt = "svg"; break;
+    case 2: dotType = "pdf"; imgExt = "pdf"; break;
     }
 
-    QString targetFile = "/tmp/graph." + dotExt;
-    QString genCommand = "dot -T" + dotType + " -Grankdir=BT -s0.5 -o" + targetFile + " " + dotFileName;
-    QProcess::execute(genCommand);
+    QTemporaryFile imgFileDummy("graph_XXXXXX." + imgExt);
+    imgFileDummy.open();
+    QString imgFileName = QDir::tempPath() + "/" + imgFileDummy.fileName();
+    imgFileDummy.close();
+
+    QString genCommand = "dot -T" + dotType + " -Grankdir=BT -s0.5 -o" + imgFileName + " " + dotFileName;
+    if (QProcess::execute(genCommand) < 0) {
+        ui->statusBar->showMessage(tr("Cannot Execute '%1'").arg(genCommand));
+        setProgress(100);
+        return;
+    }
      setProgress(95);
 
-    ui->statusBar->showMessage(tr("Created file '%1' with %2 changes").arg(targetFile).arg(histDelta.idChangeMap.size()));
+    ui->statusBar->showMessage(tr("Created file '%1' with %2 changes").arg(imgFileName).arg(histDelta.idChangeMap.size()));
 
-    QDesktopServices::openUrl(QUrl(targetFile));
+    QDesktopServices::openUrl(QUrl(imgFileName));
     setProgress(100);
 }
